@@ -25,7 +25,7 @@ public class Flight {
         flight2 = BitmapFactory.decodeResource(res, R.drawable.player2);
 
         width = flight1.getWidth();
-        height = flight2.getHeight();
+        height = flight1.getHeight();
 
         width /= 4;
         height /= 4;
