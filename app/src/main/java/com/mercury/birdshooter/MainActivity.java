@@ -7,12 +7,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
     private boolean isMute;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,14 +30,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
         TextView highScoreTxt = findViewById(R.id.highScoreTxt);
 
-        SharedPreferences prefs = getSharedPreferences("game", MODE_PRIVATE);
+        final SharedPreferences prefs = getSharedPreferences("game", MODE_PRIVATE);
         highScoreTxt.setText("HighScore: " + prefs.getInt("highscore", 0));
 
         isMute = prefs.getBoolean("isMute", false);
 
-        ImageView volumeCtrl = findViewById(R.id.volumeCtrl);
+        final ImageView volumeCtrl = findViewById(R.id.volumeCtrl);
 
         if(isMute)
             volumeCtrl.setImageResource(R.drawable.ic_baseline_volume_off_24);
