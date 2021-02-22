@@ -1,4 +1,4 @@
-package com.mercury.birdshooter;
+package com.mercurie.thicksuitcase;
 
 import android.app.Application;
 

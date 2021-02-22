@@ -1,4 +1,4 @@
-package com.mercury.birdshooter;
+package com.mercurie.thicksuitcase;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -7,10 +7,10 @@ import android.graphics.BitmapFactory;
 public class Background {
 
     int x=0, y=0;
-    Bitmap background;
+    Bitmap bgrd;
 
     Background (int screenX, int screenY, Resources res){
-        background = BitmapFactory.decodeResource(res, R.drawable.background);
-        background = Bitmap.createScaledBitmap(background, screenX, screenY, false);
+        bgrd = BitmapFactory.decodeResource(res, R.drawable.fon);
+        bgrd = Bitmap.createScaledBitmap(bgrd, screenX, screenY, false);
     }
 }

@@ -1,8 +1,10 @@
-package com.mercury.birdshooter;
+package com.mercurie.thicksuitcase;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -24,16 +26,20 @@ public class GameView extends SurfaceView implements Runnable {
     private  Thread thread;
     private  boolean isPlaying, isGameOver = false;
     private Background background1, background2;
-    private int screenX, screenY, score = 0;
+    private int screenX, screenY, score = 0, lifeCounterOfFish;
     private Paint paint;
     private Bird [] birds;
+
+    //private Life [] lifes;
+    private Bitmap life[] = new Bitmap[2];
+
     private Flight flight;
     private List<Bullet> bullets;
     private Random random;
     private SharedPreferences prefs;
     private GameActivity activity;
     private SoundPool soundPool;
-    private int sound;
+    private int sound, width, height;
     public static float screenRatioX, screenRatioY;
 
     public Button btn_fire;
@@ -79,13 +85,35 @@ public class GameView extends SurfaceView implements Runnable {
         paint.setTextSize(128);
         paint.setColor(Color.WHITE);
 
-        birds = new Bird[4];
+        birds = new Bird[5];
 
-        for (int i = 0; i<4; i++){
+        for (int i = 0; i<5; i++){
 
             Bird bird = new Bird(getResources());
             birds[i] = bird;
         }
+
+        life[0] = BitmapFactory.decodeResource(getResources(), R.drawable.life);
+        life[1] = BitmapFactory.decodeResource(getResources(), R.drawable.lif_off);
+
+        width = life[0].getWidth();
+        height = life[1].getHeight();
+
+        width /= 6;
+        height /= 6;
+
+        life[0] = Bitmap.createScaledBitmap(life[0], width, height, false);
+        life[1] = Bitmap.createScaledBitmap(life[1], width, height, false);
+
+        lifeCounterOfFish = 3;
+
+        /*lifes = new Life[3];
+
+        for (int i = 0; i<3; i++){
+
+            Life life = new Life(getResources());
+            lifes[i] = life;
+        }*/
 
         random = new Random();
     }
@@ -101,13 +129,13 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void update(){
 
-        background1.x -= 10 * screenRatioX;
-        background2.x -= 10 * screenRatioX;
+        background1.x -= 0 * screenRatioX;
+        background2.x -= 0 * screenRatioX;
 
-        if (background1.x + background1.background.getWidth() < 0){
+        if (background1.x + background1.bgrd.getWidth() < 0){
            background1.x = screenX;
         }
-        if (background2.x + background2.background.getWidth() < 0){
+        if (background2.x + background2.bgrd.getWidth() < 0){
             background2.x = screenX;
         }
 
@@ -151,15 +179,45 @@ public class GameView extends SurfaceView implements Runnable {
             if (bird.x + bird.width < 0){
 
                 if (!bird.wasShot){
+                    lifeCounterOfFish--;
+                }
+
+
+                if (lifeCounterOfFish == 0){
+                    //Toast.makeText(getContext(), "Game Over", Toast.LENGTH_SHORT).show();
                     isGameOver = true;
                     return;
                 }
 
-                int bound = (int) (15 * screenRatioX);
-                bird.speed = random.nextInt(bound);
+                if (score <=30) {
 
-                if (bird.speed < 5 * screenRatioX)
-                    bird.speed = (int) (5 * screenRatioX);
+                    int bound = (int) (15 * screenRatioX);
+                    bird.speed = random.nextInt(bound);
+
+                    if (bird.speed < 5 * screenRatioX)
+                        bird.speed = (int) (5 * screenRatioX);
+                }
+                if (score >=60){
+                    int bound = (int) (18 * screenRatioX);
+                    bird.speed = random.nextInt(bound);
+
+                    if (bird.speed < 6 * screenRatioX)
+                        bird.speed = (int) (6 * screenRatioX);
+                }
+                if (score >=100){
+                    int bound = (int) (22 * screenRatioX);
+                    bird.speed = random.nextInt(bound);
+
+                    if (bird.speed < 8 * screenRatioX)
+                        bird.speed = (int) (8 * screenRatioX);
+                }
+                if (score >=200){
+                    int bound = (int) (27 * screenRatioX);
+                    bird.speed = random.nextInt(bound);
+
+                    if (bird.speed < 10 * screenRatioX)
+                        bird.speed = (int) (10 * screenRatioX);
+                }
 
                 bird.x = screenX;
                 bird.y = random.nextInt(screenY - bird.height);
@@ -179,13 +237,24 @@ public class GameView extends SurfaceView implements Runnable {
         if (getHolder().getSurface().isValid()){
 
             Canvas canvas = getHolder().lockCanvas();
-            canvas.drawBitmap(background1.background, background1.x, background1.y, paint);
-            canvas.drawBitmap(background2.background, background2.x, background2.y, paint);
+            canvas.drawBitmap(background1.bgrd, background1.x, background1.y, paint);
+            canvas.drawBitmap(background2.bgrd, background2.x, background2.y, paint);
 
             for (Bird bird : birds)
                 canvas.drawBitmap(bird.getBird(), bird.x, bird.y, paint);
 
             canvas.drawText(score + "", screenX / 2f, 164, paint);
+
+
+
+            /*for (Life life : lifes)
+                canvas.drawBitmap(life.life, life.x, life.y, paint);*/
+
+            /*canvas.drawBitmap(life[0], 580, 10, paint);
+            canvas.drawBitmap(life[0], 680, 10, paint);
+            canvas.drawBitmap(life[0], 780, 10, paint);*/
+
+
 
             if (isGameOver){
                 isPlaying = false;
@@ -201,7 +270,19 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawBitmap(flight.getFlight(), flight.x, flight.y, paint);
 
             for (Bullet bullet : bullets)
-                canvas.drawBitmap(bullet.bullet, bullet.x, bullet.y, paint);
+                canvas.drawBitmap(bullet.nettos, bullet.x, bullet.y, paint);
+
+            for (int i=0; i<3; i++){
+                int x = (int) (380 + life[0].getWidth()  *i);
+                int y = 30;
+
+                if (i < lifeCounterOfFish){
+                    canvas.drawBitmap(life[0], x, y, null);
+                }
+                else {
+                    canvas.drawBitmap(life[1], x, y, null);
+                }
+            }
 
             getHolder().unlockCanvasAndPost(canvas);
         }
@@ -282,7 +363,7 @@ public class GameView extends SurfaceView implements Runnable {
 
         Bullet bullet = new Bullet(getResources());
         bullet.x = flight.x + flight.width;
-        bullet.y = flight.y + (flight.height / 2);
+        bullet.y = flight.y + (flight.height / 6);
         bullets.add(bullet);
     }
 }
